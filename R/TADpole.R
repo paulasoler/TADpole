@@ -27,7 +27,8 @@ load_mat <- function(mat_file, bad_frac = 0.01, centromere_search = FALSE, hist_
     message(paste(sum(bad_columns), 'bad columns found at position(s):'))
     message(paste(names(which(bad_columns)), collapse = ' '))
 
-    if (centromere_search) {
+    if (any(bad_columns) & (centromere_search == TRUE)) {
+        attr(mat, 'bad_columns') <- names(which(bad_columns))
         idx <- as.numeric(attr(mat, 'bad_columns'))
 
         list_bad_columns <- split(idx, cumsum(seq_along(idx) %in% (which(diff(idx) > 1) + 1)))
