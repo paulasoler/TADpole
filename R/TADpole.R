@@ -94,7 +94,12 @@ find_params <- function(pca, number_pca, min_clusters) {
         score
     })
 
-    scores <- matrix(nrow = length(calinhara_score), ncol = max(sapply(calinhara_score, length)))
+    #scores <- matrix(nrow = length(calinhara_score), ncol = max(sapply(calinhara_score, length)))
+     scores <- as.matrix(big.matrix(nrow = length(calinhara_score), 
+                                 ncol = max(sapply(calinhara_score, length)),
+                                 type = "integer", init = 0))
+
+    
     for (pc in 1:length(calinhara_score)) scores[pc, 1:length(calinhara_score[[pc]])] <- calinhara_score[[pc]]
     rownames(scores) <- 1:number_pca
     colnames(scores) <- 1:ncol(scores) # + 1
