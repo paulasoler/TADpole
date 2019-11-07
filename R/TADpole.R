@@ -192,14 +192,13 @@ hierarchical_plot <- function(mat_file,tadpole,chr,start,end,resol,centromere_se
                        for (i in seq(length(tadpole$clusters))){
                        lattice::panel.points(tadpole$clusters[[as.character(i)]]$start - 0.5,
                                              tadpole$clusters[[as.character(i)]]$end + 0.5,
-                                             col="black",
-                                             type="s", cex=4, lty="dashed")}
+                                             col="blue",
+                                             type="s", cex=4)}
                        lattice::panel.points(start_coord - 0.5,
                                              end_coord + 0.5,
                                              col="blue",
                                              type="s", cex=4)}) 
 
-    #
         
     if (centromere_search == TRUE) 
     {
