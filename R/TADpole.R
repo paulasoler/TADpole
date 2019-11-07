@@ -8,8 +8,8 @@
 #' @param bad_frac fraction of the matrix to falg as bad rows/columns.
 #' @param centromere_search split the matrix by the centrormere into two, smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) datasets.
 #' @examples
-#' chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
-#' mat <- load_mat(chromosome18_10Mb)
+#' chromosome18_6Mb <- system.file("extdata", "chromosome18_6Mb.tsv", package = "TADpole")
+#' mat <- load_mat(chromosome18_6Mb)
 #' @export
 
 load_mat <- function(mat_file, chr, start, end, resol, bad_frac = 0.01, 
@@ -151,8 +151,8 @@ find_params <- function(pca, number_pca, min_clusters) {
 #' @param centromere_search split the matrix by the centrormere into two, smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) datasets.
 
 #' @examples
-#' chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
-#' tadpole <- TADpole(chromosome18_10Mb)
+#' chromosome18_6Mb <- system.file("extdata", "chromosome18_6Mb.tsv", package = "TADpole")
+#' tadpole <- TADpole(chromosome18_6Mb)
 #' plot_dendro(tadpole)
 #' @export
 
@@ -279,6 +279,34 @@ hierarchical_plot <- function(mat_file,tadpole,chr,start,end,resol,centromere_se
                  colour = "#80404080", size = 11,x = 0.7, y = 1)
     }}
 
+#' Plot matrix of Calinski-Harabasz (CH) index 
+#' @param TADpole `TADpole` object returned as by function `TADpole`.
+
+#' @examples
+#' chromosome18_6Mb <- system.file("extdata", "chromosome18_6Mb.tsv", package = "TADpole")
+#' tadpole <- TADpole(chromosome18_6Mb)
+#' CH_map(tadpole)
+#' @export
+
+CH_map <- function(tadpole){
+  
+df = data.frame(Var2 = tadpole$n_pcs, Var1 = capture_chr18$optimal_n_clusters)
+s <- t(attr(tadpole,"scores"))
+tadpole_melt <-melt(s)
+tadpole_melt <-tadpole_melt[tadpole_melt$value!=0,]
+print(head(tadpole_melt))
+
+ggplot(tadpole_melt, aes(x = Var2, y = Var1)) + 
+    geom_raster(aes(fill=value)) + 
+    scale_fill_viridis() +
+    labs(x="Number of PCs", y="Number of clusters", title='Caliski-Harabasz index') +
+    theme_bw() + theme(axis.text.x=element_text(size=9, angle=0, vjust=0.3),
+                       axis.text.y=element_text(size=9),
+                       plot.title=element_text(size=11)) + 
+    geom_point(data = df,color = "blue",size = 1.5) +
+    geom_vline(xintercept=tadpole$n_pcs, linetype="dashed", color = "blue",size = 0.5) }
+
+
 
 #' Call hierarchical TADs
 #'
@@ -298,8 +326,8 @@ hierarchical_plot <- function(mat_file,tadpole,chr,start,end,resol,centromere_se
 #' It will do so regardless of whether this stretch represents a true centromere or not. Note that this feature is useful when processing an entire chromosome,
 #' but be cautious of interpreting the partitions as the two chromosomal arms (p and q) when working with smaller regions.
 #' @examples
-#' chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
-#' tadpole <- TADpole(chromosome18_10Mb)
+#' chromosome18_6Mb <- system.file("extdata", "chromosome18_6Mb.tsv", package = "TADpole")
+#' tadpole <- TADpole(chromosome18_6Mb)
 #' @export
 
 TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, 
