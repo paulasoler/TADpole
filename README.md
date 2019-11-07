@@ -178,21 +178,23 @@ tadpole = tadpole, centromere_search=FALSE)
 ```
 CH_map(tadpole)
 ```
+
 ##### 3.1.3.1) Parameters
 - **tadpole**: `tadpole` object.
 
 <p align="center">
-<img src="https://github.com/paulasoler/TADpole/blob/master/misc/Figure4.png" width="40%" align="center">
+<img src="https://github.com/paulasoler/TADpole/blob/master/misc/Figure4.png" width="50%" align="center">
 </p>
 
 # DiffT Score
 To compare pairs of topological partitions, P and Q, identified by TADpole at a fixed level of the hierarchy, we defined a difference topology score (DiffT). Specifically, the partitioned matrices were transformed into binary forms p for P, and analogously q for Q, in which each entry pij (qij) is equal to 1 if the bins i and j are in the same TAD and 0 otherwise. Then, DiffT is computed as the normalized (from 0 to 1) difference between the binarized matrices as a function of the bin index b as:
 
-<p align="left">
-<img src="https://github.com/paulasoler/TADpole/blob/master/misc/DiffT_formula.png" width="30%" align="left">
+<p align="center">
+<img src="https://github.com/paulasoler/TADpole/blob/master/misc/DiffT_formula.png" width="30%" align="center">
 </p>
 
 where N is the total number of bins.
+<br>
 
 ### 1) Input data
 The DiffT score analysis was used to compare the chromatin partitions obtanied from a fixed hierarchical level determined in two different experiments, control and case.
