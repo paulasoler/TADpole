@@ -30,7 +30,7 @@ load_mat <- function(mat_file, chr, start, end, resol, bad_frac = 0.01,
                              side=1,line=0.2,fontsize=11),
                    sub= list(paste0("Resolution:",resol),fontsize=9),
                    col.regions = colors, scales = list(draw = FALSE), colorkey = TRUE,
-                   xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black'))))}
+                   xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black'))))
     
     # Detect bad columns.
     r <- rowMeans(mat)
