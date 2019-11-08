@@ -192,7 +192,7 @@ hierarchical_plot <- function(mat_file,tadpole,chr,start,end,resol,centromere_se
                        for (i in seq(length(tadpole$clusters))){
                        lattice::panel.points(tadpole$clusters[[as.character(i)]]$start - 0.5,
                                              tadpole$clusters[[as.character(i)]]$end + 0.5,
-                                             col="blue",
+                                             col="black",
                                              type="s", cex=4)}
                        lattice::panel.points(start_coord - 0.5,
                                              end_coord + 0.5,
@@ -290,7 +290,7 @@ hierarchical_plot <- function(mat_file,tadpole,chr,start,end,resol,centromere_se
 
 CH_map <- function(tadpole){
   
-df = data.frame(Var2 = tadpole$n_pcs, Var1 = capture_chr18$optimal_n_clusters)
+df = data.frame(Var2 = tadpole$n_pcs, Var1 = tadpole$optimal_n_clusters)
 s <- t(attr(tadpole,"scores"))
 tadpole_melt <-melt(s)
 tadpole_melt <-tadpole_melt[tadpole_melt$value!=0,]
