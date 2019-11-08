@@ -212,7 +212,8 @@ In the `data/` directory, there are 2 files, control and case in a BED-like `dat
 control <- read.table(system.file("extdata", "control.bed", package = "TADpole"))
 case <- read.table(system.file("extdata", "case.bed", package = "TADpole"))
 
-difft_control_case <- diffT(control, case)
+difft_control_case = diffT(as.data.frame(control[,c(1,2,3)]),
+                                as.data.frame(case[,c(1,2,3)]))
 ```
 
 #### 2.1) Parameters
