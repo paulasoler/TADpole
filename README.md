@@ -27,7 +27,7 @@ devtools::install_github("paulasoler/TADpole")
 - First, install the required dependencies in R
 
 ```
-install.packages(c('bigmemory', 'data.table', 'reshape2', 'pryr', 'GenomicRanges',
+install.packages(c('bigmemory', 'data.table', 'reshape2', 'pryr',
 'ggpubr','ggplot2','ggdendro','plyr','zoo','cowplot','gridExtra', 'viridis', 'purrr',
 'dendextend', 'doParallel', 'foreach', 'fpc', 'Matrix', 'rioja'))
 ```
@@ -48,7 +48,7 @@ or by cloning the repository:
 git clone https://github.com/paulasoler/TADpole.git
 ```
 
-- Finally, install the TADpole package. The package 'TADpole' requires R >= 3.5.2
+- Finally, install TADpole package
 
 
 ```
