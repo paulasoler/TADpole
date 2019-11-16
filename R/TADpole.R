@@ -8,14 +8,13 @@
 #' @param bad_frac fraction of the matrix to falg as bad rows/columns.
 #' @param centromere_search split the matrix by the centrormere into two, smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) datasets.
 #' @examples
-#' chromosome18_6Mb <- system.file("extdata", "chromosome18_6Mb.tsv", package = "TADpole")
-#' mat <- load_mat(chromosome18_6Mb)
+#' mat_file <- system.file("extdata", "raw_chr18:460-606_20kb.tsv", package = "TADpole")
+#' mat <- load_mat(mat_file, chr = "chr18", start = 496, end = 606, resol = 20000)
 #' @export
 
-load_mat <- function(mat_file, chr, start, end, resol, bad_frac = 0.01, 
-                     centromere_search = FALSE) {
-    
-    mat <- as.matrix(bigmemory::read.big.matrix(mat_file, type = 'double', sep = '\t'))[, ]
+load_mat <- function(mat_file, chr, start, end, resol, bad_frac = 0.01, centromere_search = FALSE) {
+
+    mat <- as.matrix(bigmemory::read.big.matrix(mat_file, type = 'double', sep = '\t')[, ])
 
     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
     mat <- as.matrix(Matrix::forceSymmetric(mat, uplo = 'U'))
@@ -23,40 +22,40 @@ load_mat <- function(mat_file, chr, start, end, resol, bad_frac = 0.01,
     colnames(mat) <- 1:ncol(mat)
 
     # Plot Hi-C map
-    colors <- colorRampPalette(c("white","firebrick3"))
-    
+    colors <- colorRampPalette(c("white", "firebrick3"))
+
     p1 = (lattice::levelplot(as.matrix(log(mat)),
                    main=list(paste0("Raw Hi-C contact map \n",chr,":",start,"-",end),
                              side=1,line=0.2,fontsize=11),
                    sub= list(paste0("Resolution:",resol),fontsize=9),
                    col.regions = colors, scales = list(draw = FALSE), colorkey = TRUE,
                    xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black'))))
-    
+
     # Detect bad columns.
     r <- rowMeans(mat)
     bad_columns <- diag(mat) == 0
     if (bad_frac) bad_columns <- bad_columns | r < quantile(r, seq(0, 1, by = bad_frac))[2]
 
-    r_melt = melt(r)
-    gghist <- gghistogram(r_melt,  x = "value", rug = TRUE,bins = 50,add_density = TRUE,
+    r_melt = reshape2::melt(r)
+    gghist <- ggpubr::gghistogram(r_melt,  x = "value", rug = TRUE,bins = 50,add_density = TRUE,
                   fill = "#00AFBB") +
-    geom_vline(xintercept = (quantile(r, seq(0, 1, by = bad_frac))[[2]]),
+    ggplot2::geom_vline(xintercept = (quantile(r, seq(0, 1, by = bad_frac))[[2]]),
            linetype = 3)
 
-     p2 = (ggpar(gghist,submain = "... Bad columns",
+     p2 = (ggpubr::ggpar(gghist,submain = "... Bad columns",
      main = "Interactions counts",
      font.main = c(11, "bold"),
-     font.submain = c(9, "bold"),  
-     font.x = c(8, "bold"),   
-     font.y = c(8,"bold"),  
+     font.submain = c(9, "bold"),
+     font.x = c(8, "bold"),
+     font.y = c(8,"bold"),
      xlab = "Frequency of Hi-C interactions", ylab = "Counts"))
 
-    grid.arrange(p1, p2, ncol=2, heights=c(3.5,2), widths=c(2,1))
+    gridExtra::grid.arrange(p1, p2, ncol=2, heights=c(3.5,2), widths=c(2,1))
 
     message(paste(sum(bad_columns), 'bad columns found at position(s):'))
     message(paste(names(which(bad_columns)), collapse = ' '))
 
-    if (any(bad_columns) & (centromere_search == TRUE)) {
+    if (any(bad_columns) && centromere_search == TRUE) {
         attr(mat, 'bad_columns') <- names(which(bad_columns))
         idx <- as.numeric(attr(mat, 'bad_columns'))
 
@@ -123,12 +122,11 @@ find_params <- function(pca, number_pca, min_clusters) {
         score
     })
 
-    #scores <- matrix(nrow = length(calinhara_score), ncol = max(sapply(calinhara_score, length)))
-     scores <- as.matrix(big.matrix(nrow = length(calinhara_score), 
-                                 ncol = max(sapply(calinhara_score, length)),
-                                 type = "integer", init = 0))
+    scores <- matrix(nrow = length(calinhara_score), ncol = max(sapply(calinhara_score, length)))
+     # scores <- as.matrix(bigmemmory::big.matrix(nrow = length(calinhara_score),
+     #                             ncol = max(sapply(calinhara_score, length)),
+     #                             type = "integer", init = 0))
 
-    
     for (pc in 1:length(calinhara_score)) scores[pc, 1:length(calinhara_score[[pc]])] <- calinhara_score[[pc]]
     rownames(scores) <- 1:number_pca
     colnames(scores) <- 1:ncol(scores) # + 1
@@ -151,35 +149,30 @@ find_params <- function(pca, number_pca, min_clusters) {
 #' @param centromere_search split the matrix by the centrormere into two, smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) datasets.
 
 #' @examples
-#' chromosome18_6Mb <- system.file("extdata", "chromosome18_6Mb.tsv", package = "TADpole")
-#' tadpole <- TADpole(chromosome18_6Mb)
-#' plot_dendro(tadpole)
+#' mat_file <- system.file("extdata", "raw_chr18:460-606_20kb.tsv", package = "TADpole")
+#' tadpole <- TADpole(mat_file, chr = "chr18", start = 496, end = 606, resol = 20000)
+#' plot_hierarchy(mat_file, tadpole, chr = "chr18", start = 496, end = 606, resol = 20000)
 #' @export
 
-hierarchical_plot <- function(mat_file,tadpole,chr,start,end,resol,centromere_search){
-    
+plot_hierarchy <- function(mat_file, tadpole, chr, start, end, resol, centromere_search = FALSE) {
+
     # Matrix partition
-    mat <- as.matrix(bigmemory::read.big.matrix(mat_file, type = 'double', sep = '\t'))[, ]
+    mat <- as.matrix(bigmemory::read.big.matrix(mat_file, type = 'double', sep = '\t')[, ])
     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
     mat <- as.matrix(Matrix::forceSymmetric(mat, uplo = 'U'))
     rownames(mat) <- 1:nrow(mat)
     colnames(mat) <- 1:ncol(mat)
-    
+
     colors <- colorRampPalette(c('white', 'firebrick3'))
 
-    
-    if (centromere_search == TRUE) 
-    {
+    if (centromere_search) {
         start_coord <- tadpole$merging_arms$start
         end_coord <- tadpole$merging_arms$end
-    }
-    
-    else 
-    {
+    } else {
         start_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$start
         end_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$end
-        }
-    
+    }
+
     matrix_partition <- lattice::levelplot(as.matrix(log(mat)),
                   # main=list('Hierarchical chromatin organization\nchr18:9,200,000-12,130,000',side=1,line=0.5),
                   # sub= paste0("Optimal number of PCs:",as.character(tadpole$n_pcs),"       ",
@@ -197,116 +190,111 @@ hierarchical_plot <- function(mat_file,tadpole,chr,start,end,resol,centromere_se
                        lattice::panel.points(start_coord - 0.5,
                                              end_coord + 0.5,
                                              col="blue",
-                                             type="s", cex=4)}) 
+                                             type="s", cex=4)})
 
-        
-    if (centromere_search == TRUE) 
-    {
+    if (centromere_search) {
       ggdraw(xlim = c(0, 1.3), ylim = c(0, 1.3)) +
       draw_plot(matrix_partition, x = 0.2, y = 0.1, width = 0.9, height = 0.9) +
-      draw_label(paste0('Hierarchical chromatin organization\n',chr,":",start,"-",end), 
+      draw_label(paste0('Hierarchical chromatin organization\n',chr,":",start,"-",end),
                  colour = "#80404080", size = 17,x = 0.7, y = 1.15) +
       draw_label(paste0("Optimal number of PCs in Q arm:",as.character(tadpole$q$n_pcs),"    ",
                         "Optimal number of PCs in P arm:",as.character(tadpole$p$n_pcs),"     ",'\n',
                         "Optimal number of clusters in Q arm:",as.character(tadpole$q$optimal_n_clusters), "   ",
                         "Optimal number of clusters in P arm:",as.character(tadpole$p$optimal_n_clusters),"\n",
-                         "____ Optimal partition             .... Significant partitions"), 
+                         "____ Optimal partition             .... Significant partitions"),
                  colour = "#80404080", size = 10,x = 0.7, y = 1)
+    } else {
+        cut <- length(tadpole$clusters)    # Number of clusters
+        dendr <- ggdendro::dendro_data(tadpole$dendro, type="rectangle")
+        clust <- cutree(tadpole$dendro, k = cut)               # find 'cut' clusters
+        clust.df <- data.frame(label = names(clust), cluster = clust)
+
+        # Split dendrogram into upper grey section and lower coloured section
+        height <- unique(dendr$segments$y)[order(unique(dendr$segments$y), decreasing = TRUE)]
+        cut.height <- mean(c(height[cut], height[cut-1]))
+        dendr$segments$line <- ifelse(dendr$segments$y == dendr$segments$yend &
+           dendr$segments$y > cut.height, 1, 2)
+        dendr$segments$line <- ifelse(dendr$segments$yend  > cut.height, 1, dendr$segments$line)
+
+        # Number the clusters
+        dendr$segments$cluster <- c(-1, diff(dendr$segments$line))
+        change <- which(dendr$segments$cluster == 1)
+        for (i in 1:cut) dendr$segments$cluster[change[i]] = i + 1
+        dendr$segments$cluster <-  ifelse(dendr$segments$line == 1, 1,
+                     ifelse(dendr$segments$cluster == 0, NA, dendr$segments$cluster))
+        dendr$segments$cluster <- zoo::na.locf(dendr$segments$cluster)
+
+        # Consistent numbering between segment$cluster and label$cluster
+        clust.df$label <- factor(clust.df$label, levels = levels(dendr$labels$label))
+        clust.df <- plyr::arrange(clust.df, label)
+        clust.df$cluster <- factor((clust.df$cluster), levels = unique(clust.df$cluster), labels = (1:cut) + 1)
+        dendr[["labels"]] <- merge(dendr[["labels"]], clust.df, by = "label")
+
+        # Positions for cluster labels
+        n.rle <- rle(dendr$segments$cluster)
+        N <- cumsum(n.rle$lengths)
+        N <- N[seq(1, length(N), 2)] + 1
+        N.df <- dendr$segments[N, ]
+        N.df$cluster <- N.df$cluster - 1
+
+        # Plot the dendrogram
+        p <- ggplot2::ggplot() +
+          ggplot2::geom_segment(data = ggdendro::segment(dendr),
+                                ggplot2::aes(x=x, y=y, xend=xend, yend=yend, size=factor(line), colour=factor(cluster)),
+              lineend = "square", show.legend = FALSE) +
+           #scale_colour_manual(values = c("black", rainbow(cut))) +
+          ggplot2::scale_size_manual(values = c(.1, 0.3)) +
+          ggplot2::geom_text(data = N.df, ggplot2::aes(x = x, y = y, label = factor(cluster),  colour = factor(cluster + 1)),
+              hjust = 1.5, show.legend = FALSE) +
+          ggplot2::scale_y_reverse(expand = c(0.2, 0)) +
+          ggplot2::labs(x = NULL, y = NULL) +
+          ggplot2::coord_flip() +
+          ggplot2::theme(axis.line.y = ggplot2::element_blank(),
+                axis.ticks.y = ggplot2::element_blank(),
+                axis.text.y = ggplot2::element_blank(),
+                axis.title.y = ggplot2::element_blank(),
+                panel.background = ggplot2::element_rect(fill = "white"),
+                panel.grid = ggplot2::element_blank())
+
+        cowplot::ggdraw(xlim = c(0, 1.3), ylim = c(0, 1.3)) +
+          cowplot::draw_plot(matrix_partition, x = 0.4, y = 0.1, width = 0.9, height = 0.9) +
+          cowplot::draw_plot(p, x = 0, y = 0.08, width = .4, height = 0.9) +
+          cowplot::draw_label(paste0('Hierarchical chromatin organization\n',chr,":",start,"-",end),
+                     colour = "#80404080", size = 17,x = 0.7, y = 1.15) +
+          cowplot::draw_label(paste0("Optimal number of PCs:",as.character(tadpole$n_pcs),"       ",
+                            "Optimal number of clusters:",as.character(tadpole$optimal_n_clusters),"\n",
+                             "____ Optimal partition             .... Significant partitions"),
+                     colour = "#80404080", size = 11,x = 0.7, y = 1)
     }
-    
-    else 
-    {
-    cut <- length(tadpole$clusters)    # Number of clusters
-    dendr <- dendro_data(tadpole$dendro, type="rectangle")
-    clust <- cutree(tadpole$dendro, k = cut)               # find 'cut' clusters
-    clust.df <- data.frame(label = names(clust), cluster = clust)
+}
 
-    # Split dendrogram into upper grey section and lower coloured section
-    height <- unique(dendr$segments$y)[order(unique(dendr$segments$y), decreasing = TRUE)]
-    cut.height <- mean(c(height[cut], height[cut-1]))
-    dendr$segments$line <- ifelse(dendr$segments$y == dendr$segments$yend &
-       dendr$segments$y > cut.height, 1, 2)
-    dendr$segments$line <- ifelse(dendr$segments$yend  > cut.height, 1, dendr$segments$line)
-
-    # Number the clusters
-    dendr$segments$cluster <- c(-1, diff(dendr$segments$line))
-    change <- which(dendr$segments$cluster == 1)
-    for (i in 1:cut) dendr$segments$cluster[change[i]] = i + 1
-    dendr$segments$cluster <-  ifelse(dendr$segments$line == 1, 1, 
-                 ifelse(dendr$segments$cluster == 0, NA, dendr$segments$cluster))
-    dendr$segments$cluster <- na.locf(dendr$segments$cluster) 
-
-    # Consistent numbering between segment$cluster and label$cluster
-    clust.df$label <- factor(clust.df$label, levels = levels(dendr$labels$label))
-    clust.df <- arrange(clust.df, label)
-    clust.df$cluster <- factor((clust.df$cluster), levels = unique(clust.df$cluster), labels = (1:cut) + 1)
-    dendr[["labels"]] <- merge(dendr[["labels"]], clust.df, by = "label")
-
-    # Positions for cluster labels
-    n.rle <- rle(dendr$segments$cluster)
-    N <- cumsum(n.rle$lengths)
-    N <- N[seq(1, length(N), 2)] + 1
-    N.df <- dendr$segments[N, ]
-    N.df$cluster <- N.df$cluster - 1
-
-    # Plot the dendrogram
-    p <- ggplot() + 
-       geom_segment(data = segment(dendr), 
-          aes(x=x, y=y, xend=xend, yend=yend, size=factor(line), colour=factor(cluster)), 
-          lineend = "square", show.legend = FALSE) + 
-       #scale_colour_manual(values = c("black", rainbow(cut))) +
-       scale_size_manual(values = c(.1, 0.3)) +
-       geom_text(data = N.df, aes(x = x, y = y, label = factor(cluster),  colour = factor(cluster + 1)), 
-          hjust = 1.5, show.legend = FALSE) +
-       scale_y_reverse(expand = c(0.2, 0)) + 
-       labs(x = NULL, y = NULL) +
-       coord_flip() +
-        theme(axis.line.y = element_blank(),
-            axis.ticks.y = element_blank(),
-            axis.text.y = element_blank(),
-            axis.title.y = element_blank(),
-            panel.background = element_rect(fill = "white"),
-            panel.grid = element_blank())
-
-      ggdraw(xlim = c(0, 1.3), ylim = c(0, 1.3)) +
-      draw_plot(matrix_partition, x = 0.4, y = 0.1, width = 0.9, height = 0.9) +
-      draw_plot(p, x = 0, y = 0.08, width = .4, height = 0.9) +
-      draw_label(paste0('Hierarchical chromatin organization\n',chr,":",start,"-",end), 
-                 colour = "#80404080", size = 17,x = 0.7, y = 1.15) +
-      draw_label(paste0("Optimal number of PCs:",as.character(tadpole$n_pcs),"       ",
-                        "Optimal number of clusters:",as.character(tadpole$optimal_n_clusters),"\n",
-                         "____ Optimal partition             .... Significant partitions"), 
-                 colour = "#80404080", size = 11,x = 0.7, y = 1)
-    }}
-
-#' Plot matrix of Calinski-Harabasz (CH) index 
+#' Plot matrix of Calinski-Harabasz (CH) index
 #' @param TADpole `TADpole` object returned as by function `TADpole`.
 
 #' @examples
-#' chromosome18_6Mb <- system.file("extdata", "chromosome18_6Mb.tsv", package = "TADpole")
-#' tadpole <- TADpole(chromosome18_6Mb)
+#' mat_file <- system.file("extdata", "raw_chr18:460-606_20kb.tsv", package = "TADpole")
+#' tadpole <- TADpole(mat_file)
 #' CH_map(tadpole)
 #' @export
 
-CH_map <- function(tadpole){
-  
-df = data.frame(Var2 = tadpole$n_pcs, Var1 = tadpole$optimal_n_clusters)
-s <- t(attr(tadpole,"scores"))
-tadpole_melt <-melt(s)
-tadpole_melt <-tadpole_melt[tadpole_melt$value!=0,]
-print(head(tadpole_melt))
+CH_map <- function(tadpole) {
+  # TODO: make it compatible with centromere = TRUE.
+    df = data.frame(Var2 = tadpole$n_pcs, Var1 = tadpole$optimal_n_clusters)
+    s <- t(tadpole$scores)
+    tadpole_melt <- reshape2::melt(s)
+    tadpole_melt <-tadpole_melt[tadpole_melt$value!=0,]
+    print(head(tadpole_melt))
 
-ggplot(tadpole_melt, aes(x = Var2, y = Var1)) + 
-    geom_raster(aes(fill=value)) + 
-    scale_fill_viridis() +
-    labs(x="Number of PCs", y="Number of clusters", title='Caliski-Harabasz index') +
-    theme_bw() + theme(axis.text.x=element_text(size=9, angle=0, vjust=0.3),
-                       axis.text.y=element_text(size=9),
-                       plot.title=element_text(size=11)) + 
-    geom_point(data = df,color = "blue",size = 1.5) +
-    geom_vline(xintercept=tadpole$n_pcs, linetype="dashed", color = "blue",size = 0.5) }
-
-
+    ggplot2::ggplot(tadpole_melt, ggplot2::aes(x = Var2, y = Var1)) +
+      ggplot2::geom_raster(ggplot2::aes(fill=value)) +
+      viridis::scale_fill_viridis() +
+      ggplot2::labs(x="Number of PCs", y="Number of clusters", title='Caliski-Harabasz index') +
+      ggplot2::theme_bw() + ggplot2::theme(axis.text.x=ggplot2::element_text(size=9, angle=0, vjust=0.3),
+                           axis.text.y=ggplot2::element_text(size=9),
+                           plot.title=ggplot2::element_text(size=11)) +
+      ggplot2::geom_point(data = df,color = "blue",size = 1.5) +
+      ggplot2::geom_vline(xintercept=tadpole$n_pcs, linetype="dashed", color = "blue",size = 0.5)
+}
 
 #' Call hierarchical TADs
 #'
@@ -326,13 +314,13 @@ ggplot(tadpole_melt, aes(x = Var2, y = Var1)) +
 #' It will do so regardless of whether this stretch represents a true centromere or not. Note that this feature is useful when processing an entire chromosome,
 #' but be cautious of interpreting the partitions as the two chromosomal arms (p and q) when working with smaller regions.
 #' @examples
-#' chromosome18_6Mb <- system.file("extdata", "chromosome18_6Mb.tsv", package = "TADpole")
-#' tadpole <- TADpole(chromosome18_6Mb)
+#' mat_file <- system.file("inst/extdata", "raw_chr18:460-606_20kb.tsv", package = "TADpole")
+#' tadpole <- TADpole(mat_file, chr = "chr18", start = 496, end = 606, resol = 20000)
 #' @export
 
-TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, 
+TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01,
                     chr, start, end, resol, centromere_search = FALSE) {
-    
+
     # Load and clean data.
     mat <- load_mat(mat_file, chr, start, end, resol,
                     bad_frac = bad_frac, centromere_search = centromere_search)
@@ -452,7 +440,8 @@ TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01,
         tadpole <- structure(list('n_pcs' = optimal_params$n_PCs,
                                   'optimal_n_clusters' = optimal_params$n_clusters,
                                   'dendro' = clust,
-                                  'clusters' = list()),
+                                  'clusters' = list(),
+                                  'scores' = optimal_params$scores),
                              class = 'tadpole')
 
         for (k in which(!is.na(optimal_params$scores[optimal_params$n_PCs, ]))) {
