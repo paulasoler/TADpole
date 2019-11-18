@@ -26,7 +26,7 @@ devtools::install_github("paulasoler/TADpole")
 
 - First, install the required dependencies in R
 
-```
+```R
 install.packages(c('bigmemory', 'data.table', 'reshape2', 'pryr',
 'ggpubr','ggplot2','ggdendro','plyr','zoo','cowplot','gridExtra', 'viridis', 'purrr',
 'dendextend', 'doParallel', 'foreach', 'fpc', 'Matrix', 'rioja'))
@@ -36,22 +36,24 @@ install.packages(c('bigmemory', 'data.table', 'reshape2', 'pryr',
 
 by using _wget_:
 
-```
+```shell
 wget https://github.com/paulasoler/TADpole/archive/master.zip
 unzip master.zip
-mv master TADpole
+mv TADpole-master TADpole
 ```
+Note: if you download the zip file from the GitHub website instead, it will be named `TADpole-master`,
+so please adapt the `unzip` command accordingly.
 
 or by cloning the repository:
 
-```
+```shell
 git clone https://github.com/paulasoler/TADpole.git
 ```
 
-- Finally, install TADpole package
+- Finally, install TADpole.
 
 
-```
+```shell
 R CMD INSTALL TADpole
 ```
 
@@ -79,7 +81,7 @@ Schematic overview of the TADpole algorithm (for further details, refer to Soler
 
 The basic usage is the following:
 
-```
+```R
 library(TADpole)
 chr18_460-606_20kb <- system.file("extdata", "raw_chr18:460-606_20kb.mat", package = "TADpole")
 
@@ -111,7 +113,7 @@ The function `TADpole` returns a `tadpole` object containing the following descr
 - ***score***: CH index associated to each dendrogram.
 - ***merging_arms***: if `centromere_search` is `TRUE`, contains the start and end coordinates of the TADs of the full chromosome.
 
-```
+```R
 head(tadpole)
 
 $n_pcs
@@ -155,7 +157,7 @@ Automatically, TADpole generates a heatmap of the intra-chromosomal interaction 
 **Left**, complete dendrogram of the Hi-C matrix cut at a maximum significant number of levels (max(ND)) reported by 
 the broken-stick model (containing from 2 to 16 partitions) and, from them, the highest scoring level according to the CH index is selected. **Right**, Hi-C contact map showing the complete hierarchy of the significant levels selected by the BS model (black lines) along with the optimal one in 12 specific partitions, as identified by the highest CH index (blue line).
 
-```
+```R
 hierarchical_plot(mat_file = chr18_460-606_20kb, chr = "chr18", start = 9200000, end = 12120000, resol = 20000,
 tadpole = tadpole, centromere_search=FALSE)
 ```
@@ -175,7 +177,7 @@ tadpole = tadpole, centromere_search=FALSE)
 
 #### 3.1.3) Matrix of Calinski-Harabasz  indexes 
 
-```
+```R
 CH_map(tadpole)
 ```
 
@@ -208,12 +210,12 @@ In the `data/` directory, there are 2 files, control and case in a BED-like `dat
 
 ### 2) Computing the DiffT score
 
-```
+```R
 control <- read.table(system.file("extdata", "control.bed", package = "TADpole"))
 case <- read.table(system.file("extdata", "case.bed", package = "TADpole"))
 
-difft_control_case = diffT(as.data.frame(control[,c(1,2,3)]),
-                                as.data.frame(case[,c(1,2,3)]))
+difft_control_case <- diffT(as.data.frame(control[,c(1,2,3)]),
+                            as.data.frame(case[,c(1,2,3)]))
 ```
 
 #### 2.1) Parameters
@@ -223,12 +225,12 @@ difft_control_case = diffT(as.data.frame(control[,c(1,2,3)]),
 The function `diffT` returns a `numeric` vector representing the cumulative DiffT score score profiles as a function of the matrix bins.
 The highest local differences between the two matrices can be identified by the sharpest changes in the slope of the function.
 
-```
-difft_melt = melt(difft_control_case)
-difft_melt$bin = seq(nrow(difft_melt))
-difft_melt$level = level
+```R
+difft_melt <- melt(difft_control_case)
+difft_melt$bin <- seq(nrow(difft_melt))
+difft_melt$level <- level
 
-difft_melt$level = as.factor(difft_melt$level)
+difft_melt$level <- as.factor(difft_melt$level)
 ggline(difft_melt, x = "bin", y = "value",color = "level", plot_type = "l") 
 ``````
 
