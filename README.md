@@ -86,7 +86,7 @@ library(TADpole)
 chr18_300_500_30kb <- system.file("extdata", "raw_chr18_300_500_30kb.tsv", package = "TADpole")
 
 tadpole <- TADpole(mat_file = chr18_300_500_30kb, 
-chr = "chr18", start = 9200000, end = 12120000, resol = 30000,bad_frac = 0.01, centromere_search = FALSE)
+chr = "chr18", start = 9000000, end = 15000000, resol = 30000,bad_frac = 0.01, centromere_search = FALSE)
 ```
 
 #### 2.2.1) Parameters
@@ -158,7 +158,7 @@ Automatically, TADpole generates a heatmap of the intra-chromosomal interaction 
 the broken-stick model (containing from 2 to 16 partitions) and, from them, the highest scoring level according to the CH index is selected. **Right**, Hi-C contact map showing the complete hierarchy of the significant levels selected by the BS model (black lines) along with the optimal one in 12 specific partitions, as identified by the highest CH index (blue line).
 
 ```R
-hierarchical_plot(mat_file = chr18_300_500_30kb, chr = "chr18", start = 9200000, end = 12120000, resol = 30000,
+plot_hierarchy(mat_file = chr18_300_500_30kb, chr = "chr18", start = 9000000, end = 15000000, resol = 30000,
 tadpole = tadpole, centromere_search=FALSE)
 ```
 ##### 3.1.2.1) Parameters
