@@ -38,8 +38,8 @@ by using _wget_:
 
 ```
 wget https://github.com/paulasoler/TADpole/archive/master.zip
-unzip TADpole-master.zip
-mv TADpole-master TADpole
+unzip master.zip
+mv master TADpole
 ```
 
 or by cloning the repository:
