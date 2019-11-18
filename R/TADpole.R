@@ -186,7 +186,7 @@ plot_hierarchy <- function(mat_file, tadpole, chr, start, end, resol, centromere
                        lattice::panel.points(tadpole$clusters[[as.character(i)]]$start - 0.5,
                                              tadpole$clusters[[as.character(i)]]$end + 0.5,
                                              col="black",
-                                             type="s", cex=4)}
+                                             type="s", cex=4, lty="dashed")}
                        lattice::panel.points(start_coord - 0.5,
                                              end_coord + 0.5,
                                              col="blue",
