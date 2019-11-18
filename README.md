@@ -226,12 +226,12 @@ The function `diffT` returns a `numeric` vector representing the cumulative Diff
 The highest local differences between the two matrices can be identified by the sharpest changes in the slope of the function.
 
 ```R
-difft_melt <- melt(difft_control_case)
+difft_melt <- reshape2::melt(difft_control_case)
 difft_melt$bin <- seq(nrow(difft_melt))
 difft_melt$level <- level
 
 difft_melt$level <- as.factor(difft_melt$level)
-ggline(difft_melt, x = "bin", y = "value",color = "level", plot_type = "l") 
+ggpubr::ggline(difft_melt, x = "bin", y = "value",color = "level", plot_type = "l") 
 ``````
 
 <p align="center">
