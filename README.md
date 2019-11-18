@@ -61,10 +61,10 @@ R CMD INSTALL TADpole
 
 In this repository, we provide a test case from a publicly available Hi-C data set (SRA: [SRR1658572](https://www.ebi.ac.uk/ena/data/view/SRR1658572)) (1).
 
-In the `inst/extdata/` directory, we provided a 3Mb-region (chr18:9,200,000-12,120,000) of a human Hi-C dataset at 20kb resolution. 
+In the `inst/extdata/` directory, we provided a 3Mb-region (chr18:9,200,000-12,120,000) of a human Hi-C dataset at 30kb resolution. 
 
 ```
-- inst/extdata/raw_chr18:460-606_20kb.mat
+- inst/extdata/raw_chr18_300_500_30kb.tsv
 ```
 
 To obtain this interaction matrix, we processed the Hi-C data using the [TADbit](https://github.com/3DGenomes/TADbit) (2) Python library, that deals with all the necessary steps to analyze and normalize Hi-C data.
@@ -83,10 +83,10 @@ The basic usage is the following:
 
 ```R
 library(TADpole)
-chr18_460-606_20kb <- system.file("extdata", "raw_chr18:460-606_20kb.mat", package = "TADpole")
+chr18_300-500_30kb <- system.file("extdata", "raw_chr18_300_500_30kb.tsv", package = "TADpole")
 
-tadpole <- TADpole(mat_file = chr18_460-606_20kb, 
-chr = "chr18", start = 9200000, end = 12120000, resol = 20000,bad_frac = 0.01, centromere_search = FALSE)
+tadpole <- TADpole(mat_file = chr18_300-500_30kb, 
+chr = "chr18", start = 9200000, end = 12120000, resol = 30000,bad_frac = 0.01, centromere_search = FALSE)
 ```
 
 #### 2.2.1) Parameters
@@ -158,7 +158,7 @@ Automatically, TADpole generates a heatmap of the intra-chromosomal interaction 
 the broken-stick model (containing from 2 to 16 partitions) and, from them, the highest scoring level according to the CH index is selected. **Right**, Hi-C contact map showing the complete hierarchy of the significant levels selected by the BS model (black lines) along with the optimal one in 12 specific partitions, as identified by the highest CH index (blue line).
 
 ```R
-hierarchical_plot(mat_file = chr18_460-606_20kb, chr = "chr18", start = 9200000, end = 12120000, resol = 20000,
+hierarchical_plot(mat_file = chr18_300-500_30kb, chr = "chr18", start = 9200000, end = 12120000, resol = 30000,
 tadpole = tadpole, centromere_search=FALSE)
 ```
 ##### 3.1.2.1) Parameters
