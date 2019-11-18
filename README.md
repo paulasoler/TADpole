@@ -172,7 +172,7 @@ tadpole = tadpole, centromere_search=FALSE)
 
 
 <p align="center">
-<img src="https://github.com/paulasoler/TADpole/blob/master/misc/Figure3.png" width="70%">
+<img src="https://github.com/paulasoler/TADpole/blob/master/misc/Figure3_1.png" width="70%">
 </p>
 
 #### 3.1.3) Matrix of Calinski-Harabasz  indexes 
