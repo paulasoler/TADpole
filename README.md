@@ -226,6 +226,7 @@ The function `diffT` returns a `numeric` vector representing the cumulative Diff
 The highest local differences between the two matrices can be identified by the sharpest changes in the slope of the function.
 
 ```R
+level <- 1
 difft_melt <- reshape2::melt(difft_control_case)
 difft_melt$bin <- seq(nrow(difft_melt))
 difft_melt$level <- level
