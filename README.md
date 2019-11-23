@@ -103,13 +103,13 @@ tadpole <- TADpole(mat_file, chr = "chr18", start = 9000000, end = 15000000, res
 ## 3) Output
 The function `TADpole` returns a `tadpole` object containing the following descriptors:
 
-- ***n_pcs***: optimal number of principal components.
-- ***optimal_n_clusters***: optimal number of chromatin partitions (that is the index of the optimal level + 1).
-- ***dendro***: hierarchical tree-like structure cut at the maximum significant number of levels identified by the broken-stick model (max(ND)).
-- ***clusters***: a `list` containing the TADs for each hierarchical level _(x)_ defined by the broken stick model.
-  + ***clusters$`x`***: start and end coordinades of all TADs.
-- ***score***: CH index associated to each dendrogram.
-- ***merging_arms***: if `centromere_search` is `TRUE`, contains the start and end coordinates of the TADs of the full chromosome.
+- **n_pcs**: optimal number of principal components.
+- **optimal_n_clusters**: optimal number of chromatin partitions (that is the index of the optimal level + 1).
+- **dendro**: hierarchical tree-like structure cut at the maximum significant number of levels identified by the broken-stick model (max(ND)).
+- **clusters**: a `list` containing the TADs for each hierarchical level _(x)_ defined by the broken stick model.
+  + **clusters$`x`**: start and end coordinades of all TADs.
+- **score**: CH index associated to each dendrogram.
+- **merging_arms**: if `centromere_search` is `TRUE`, contains the start and end coordinates of the TADs of the full chromosome.
 
 ```R
 head(tadpole)
@@ -223,7 +223,7 @@ The function `diffT` returns a `numeric` vector representing the cumulative Diff
 The highest local differences between the two matrices can be identified by the sharpest changes in the slope of the function.
 
 ```R
-plot(difft_control_case, t='l')
+plot(difft_control_case, type = "l")
 ``````
 
 <p align="center">
