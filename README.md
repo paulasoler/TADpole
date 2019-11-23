@@ -27,9 +27,9 @@ devtools::install_github("paulasoler/TADpole")
 - First, install the required dependencies in R
 
 ```R
-install.packages(c('bigmemory', 'data.table', 'reshape2', 'pryr', 'ggpubr', 'ggplot2',
-                   'ggdendro', 'plyr', 'zoo', 'cowplot', 'gridExtra', 'viridis', 'purrr',
-                   'dendextend', 'doParallel', 'foreach', 'fpc', 'Matrix', 'rioja'))
+install.packages(c('bigmemory', 'cowplot', 'doParallel', 'foreach', 'fpc',
+                   'ggdendro', 'ggplot2', 'ggpubr', 'gridExtra', 'Matrix',
+                   'plyr', 'reshape2', 'rioja', 'viridis, 'zoo'))
 ```
 
 - Then, get the latest version of the source code from Github
