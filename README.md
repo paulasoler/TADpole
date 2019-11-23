@@ -29,7 +29,7 @@ devtools::install_github("paulasoler/TADpole")
 ```R
 install.packages(c('bigmemory', 'cowplot', 'doParallel', 'foreach', 'fpc',
                    'ggdendro', 'ggplot2', 'ggpubr', 'gridExtra', 'Matrix',
-                   'plyr', 'reshape2', 'rioja', 'viridis, 'zoo'))
+                   'plyr', 'reshape2', 'rioja', 'viridis', 'zoo'))
 ```
 
 - Then, get the latest version of the source code from Github
