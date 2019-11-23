@@ -60,7 +60,7 @@ Note: if you download the zip file from the GitHub website instead, it will be n
 
 In this repository, we provide a test case from a publicly available Hi-C data set (SRA: [SRR1658572](https://www.ebi.ac.uk/ena/data/view/SRR1658572)) (1).
 
-In the `inst/extdata/` directory, we provided a 3Mb-region (chr18:9,200,000-12,200,000) of a human Hi-C dataset at 30kb resolution. 
+In the `inst/extdata/` directory, we provided a 3 Mb region (chr18:9,200,000-12,200,000) of a human Hi-C dataset at 30kb resolution. 
 
 ```
 inst/extdata/raw_chr18_300_500_30kb.tsv
@@ -69,7 +69,7 @@ inst/extdata/raw_chr18_300_500_30kb.tsv
 To obtain this interaction matrix, we processed the Hi-C data using the [TADbit](https://github.com/3DGenomes/TADbit) (2) Python package, that deals with all the necessary processing and normalization steps.
 
 ### 2.1) Input data
-To run the main function `TADpole`, you need to provide an intrachromosomal interaction matrix, representing an entire chromosome or a chromosome region. The input is a tab-separated values file containing the interaction matrix (M) with N rows and N columns, where N is the number of bins in which the chromosome region is divided. Each position of the matrix (M<sub>ij</sub>) contains the interaction values (raw or normalized) between the corresponding pair of genomic bins i and j. We recommend [ONED](https://github.com/qenvio/dryhic) (3) normalization, as it effectively corrects for known experimental biases.
+To run the main function `TADpole`, you need to provide an intrachromosomal interaction matrix, representing an entire chromosome or a chromosome region. The input is a tab-separated values file containing the interaction matrix (_M_) with _N_ rows and _N_ columns, where _N_ is the number of bins in which the chromosome region is divided. Each position of the matrix (_M<sub>ij</sub>_) contains the interaction values (raw or normalized) between the corresponding pair of genomic bins _i_ and _j_. We recommend [ONED](https://github.com/qenvio/dryhic) (3) normalization, as it effectively corrects for known experimental biases.
 
 ### 2.2) Running the algorithm
 
@@ -154,7 +154,7 @@ Automatically, TADpole generates a map of the intra-chromosomal interaction matr
 </p>
 
 #### 3.1.2) Hierarchical plot
-**Left**, the complete dendrogram obtained from the Hi-C matrix cut at a maximum significant number of levels (max(ND)) reported by the broken-stick model (including the partitions in 2 up to 16 TADs). Among these levels, the highest-scoring one is selected according to the CH index analysis. **Right**, Hi-C contact map showing the complete hierarchy of the significant levels selected by the BS model (black lines) along with the optimal one with 12 TADs, identified by the highest CH index (blue line).
+**Left**, the complete dendrogram obtained from the Hi-C matrix cut at a maximum significant number of levels (_max(ND)_) reported by the broken-stick model (including the partitions in 2 up to 16 TADs). Among these levels, the highest-scoring one is selected according to the CH index analysis. **Right**, Hi-C contact map showing the complete hierarchy of the significant levels selected by the broken stick model (black lines) along with the optimal one with 12 TADs, identified by the highest CH index (blue line).
 
 ```R
 plot_hierarchy(mat_file, tadpole, chr = "chr18", start = 9000000, end = 15000000, resol = 30000)
@@ -187,13 +187,13 @@ CH_map(tadpole)
 </p>
 
 # DiffT score
-To compare pairs of topological partitions, P and Q, identified by TADpole at the same level of the hierarchy, we defined a Difference Topology score (DiffT). Specifically, the partitioned matrices are transformed into binary forms p for P, and q for Q, in which each entry p<sub>ij</sub> (q<sub>ij</sub>) is equal to 1 if the bins i and j are in the same TAD and 0 otherwise. Then, the DiffT is computed as the normalized (from 0 to 1) difference between the binarized matrices as a function of the bin index b as:
+To compare pairs of topological partitions, _P_ and _Q_, identified by TADpole at the same level of the hierarchy, we defined a Difference Topology score (DiffT). Specifically, the partitioned matrices are transformed into binary forms _p_ for _P_, and _q_ for _Q_, in which each entry _p<sub>ij</sub>_ (_q<sub>ij</sub>_) is equal to 1 if the bins _i_ and _j_ are in the same TAD and 0 otherwise. Then, the DiffT is computed as the normalized (from 0 to 1) difference between the binarized matrices as a function of the bin index _b_ as:
 
 <p align="center">
 <img src="https://github.com/paulasoler/TADpole/blob/master/misc/DiffT_formula.png" width="30%" align="center">
 </p>
 
-where N is the total number of bins.
+where _N_ is the total number of bins.
 <br>
 
 ### 1) Input data
