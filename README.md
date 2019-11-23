@@ -36,7 +36,7 @@ install.packages(c('bigmemory', 'data.table', 'reshape2', 'pryr', 'ggpubr', 'ggp
 
 by using _wget_:
 
-```shell
+```Shell
 wget https://github.com/paulasoler/TADpole/archive/master.zip
 unzip master.zip
 mv TADpole-master TADpole
@@ -44,13 +44,13 @@ mv TADpole-master TADpole
 
 or by cloning the repository:
 
-```shell
+```Shell
 git clone https://github.com/paulasoler/TADpole.git
 ```
 
 - Finally, install TADpole.
 
-```shell
+```Shell
 R CMD INSTALL TADpole
 ```
 
