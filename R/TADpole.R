@@ -7,7 +7,6 @@
 #' @param resol numeric resolution/binning of the Hi-C experiment.
 #' @param bad_frac fraction of the matrix to falg as bad rows/columns.
 #' @param centromere_search split the matrix by the centrormere into two, smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) datasets.
-#' @param cores number of cores to use. By default, it will use all available cores.
 #' @examples
 #' mat_file <- system.file("extdata", "raw_chr18:460-606_20kb.tsv", package = "TADpole")
 #' mat <- load_mat(mat_file, chr = "chr18", start = 496, end = 606, resol = 20000)
@@ -100,7 +99,7 @@ sparse_cor <- function(x) {
     list(cov = covmat, cor = cormat)
 }
 
-find_params <- function(pca, number_pca, min_clusters, cores = parallel::detectCores()) {
+find_params <- function(pca, number_pca, min_clusters, cores) {
     doParallel::registerDoParallel(cores = cores)
     calinhara_score <- foreach::`%dopar%`(foreach::foreach(i = 1:number_pca), {
         pcs <- as.matrix(pca$x[, 1:i])
@@ -142,7 +141,7 @@ find_params <- function(pca, number_pca, min_clusters, cores = parallel::detectC
 
 #' Plot hierarchical_plot
 #' @param mat_file path to the input file. Must be in a tab-delimited matrix format.
-#' @param TADpole `TADpole` object returned as by function `TADpole`.
+#' @param tadpole `TADpole` object returned as by function `TADpole`.
 #' @param chr string with the chromosome name.
 #' @param start numeric start position of the region or of the chromosome.
 #' @param end numeric end position of the region or of the chromosome.
@@ -332,6 +331,7 @@ CH_map <- function(tadpole) {
 #' @param end numeric end position of the region or of the chromosome.
 #' @param resol numeric resolution/binning of the Hi-C experiment.
 #' @param centromere_search split the matrix by the centrormere into two smaller matrices representing the chromosomal arms. Useful when woring with big (>15000 bins) datasets.
+#' @param cores number of cores to use. By default, it will use all available cores.
 #' @return `tadpole` object that defines the clustering of genomic regions.
 #' @details The `centromere_search` parameter will split the matrix into two by the region with the longes stretch of bad (low signal) rows/columns.
 #' It will do so regardless of whether this stretch represents a true centromere or not. Note that this feature is useful when processing an entire chromosome,
@@ -342,7 +342,7 @@ CH_map <- function(tadpole) {
 #' @export
 
 TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01,
-                    chr, start, end, resol, centromere_search = FALSE) {
+                    chr, start, end, resol, centromere_search = FALSE, cores = parallel::detectCores()) {
 
     # Load and clean data.
     mat <- load_mat(mat_file, chr, start, end, resol,
@@ -367,7 +367,7 @@ TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01,
             pca <- prcomp(correlation_matrix, rank. = number_pca)
 
             # Find optimal clustering parameters based on Calinhara score.
-            optimal_params <- find_params(pca, number_pca, min_clusters)
+            optimal_params <- find_params(pca, number_pca, min_clusters, cores)
 
             # Cluster the PCs subset with the best mean-CHI criterion.
             pcs <- as.matrix(pca$x[, 1:optimal_params$n_PCs])
