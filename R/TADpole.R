@@ -7,6 +7,7 @@
 #' @param resol numeric resolution/binning of the Hi-C experiment.
 #' @param bad_frac fraction of the matrix to falg as bad rows/columns.
 #' @param centromere_search split the matrix by the centrormere into two, smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) datasets.
+#' @param cores number of cores to use. By default, it will use all available cores.
 #' @examples
 #' mat_file <- system.file("extdata", "raw_chr18:460-606_20kb.tsv", package = "TADpole")
 #' mat <- load_mat(mat_file, chr = "chr18", start = 496, end = 606, resol = 20000)
@@ -99,8 +100,8 @@ sparse_cor <- function(x) {
     list(cov = covmat, cor = cormat)
 }
 
-find_params <- function(pca, number_pca, min_clusters) {
-    doParallel::registerDoParallel(cores = parallel::detectCores())
+find_params <- function(pca, number_pca, min_clusters, cores = parallel::detectCores()) {
+    doParallel::registerDoParallel(cores = cores)
     calinhara_score <- foreach::`%dopar%`(foreach::foreach(i = 1:number_pca), {
         pcs <- as.matrix(pca$x[, 1:i])
         row.names(pcs) <- 1:nrow(pcs)
