@@ -75,7 +75,7 @@ To run the main function `TADpole`, you need to provide an intrachromosomal inte
 
 ### 2.2) Running the algorithm
 
-Schematic overview of the TADpole algorithm (for further details, refer to [Soler-Vila _et al_.](https://www.biorxiv.org/content/10.1101/698720v1) (4)
+Schematic overview of the TADpole algorithm (for further details, refer to [Soler-Vila _et al_.](https://www.biorxiv.org/content/10.1101/698720v1) (4))
 
 ![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/Figure1.png)
 
